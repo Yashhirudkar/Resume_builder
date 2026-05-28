@@ -1255,6 +1255,8 @@ body {
   .app-layout {
     grid-template-columns: 1fr;
     height: auto;
+    gap: 1.5rem;
+    padding: 0 1.5rem;
   }
   .panel {
     height: 700px;
@@ -1262,16 +1264,122 @@ body {
 }
 
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.2rem;
+  .nav-inner {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
+  .nav-logo {
+    font-size: 1.15rem;
+  }
+  .logo-icon {
+    font-size: 1.4rem;
+  }
+  .nav-badge {
+    display: none; /* Hide badge to make room for download buttons */
+  }
+  .nav-actions {
+    gap: 0.5rem;
+  }
+  .btn-nav-download {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+  
+  .hero {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .stat-pill {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+  }
+
   .field-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   .full-width {
     grid-column: span 1;
   }
   .app-layout {
-    padding: 0 1rem;
+    padding: 0 1rem 3rem;
+  }
+  .panel {
+    height: 600px; /* Shorter panels on mobile to reduce scroll height */
+    border-radius: 12px;
+  }
+  .form-scroll {
+    padding: 1.25rem;
+    gap: 1.75rem;
+  }
+  
+  /* Resume preview details on mobile */
+  .resume-paper {
+    padding: 1.5rem;
+    font-size: 8.5pt;
+  }
+  .resume-paper-wrap {
+    padding: 1rem;
+  }
+  .res-name {
+    font-size: 16pt;
+  }
+  .res-title {
+    font-size: 10pt;
+  }
+  .res-contact span {
+    margin: 0 4px;
+    font-size: 8pt;
+  }
+  .res-skills-label {
+    width: 100%;
+    float: none;
+    margin-bottom: 2px;
+  }
+  .res-skills-val {
+    width: 100%;
+    float: none;
+  }
+  
+  /* Footer CTA layout */
+  .generate-wrap {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .btn-generate {
+    width: 100%;
+  }
+  .btn-download {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.6rem;
+  }
+  .panel {
+    height: 550px;
+  }
+  .step span {
+    display: none; /* Hide step names on small screens, keep icons */
+  }
+  .step-icon {
+    font-size: 1.3rem;
+    opacity: 0.8;
   }
 }
