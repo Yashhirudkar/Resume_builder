@@ -986,6 +986,18 @@ body {
   font-size: 8.7pt;
   color: var(--res-text-light);
   line-height: 1.35;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.res-entry-header, .res-entry-subheader {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.res-skills-row {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 /* ░░ JSON & ANALYSIS TABS ░░ */
