@@ -795,63 +795,62 @@ function handleDownloadPdf() {
     return;
   }
 
-  // Capture original scroll positions
+  // Capture original scroll positions and element styles
   const originalScrollY = window.scrollY;
   const originalScrollX = window.scrollX;
 
-  // Scroll to absolute top-left to eliminate any viewport offset calculations
+  const originalWidth = paper.style.width;
+  const originalMaxWidth = paper.style.maxWidth;
+  const originalMinHeight = paper.style.minHeight;
+  const originalBoxShadow = paper.style.boxShadow;
+  const originalPadding = paper.style.padding;
+
+  // Scroll to absolute top-left to eliminate viewport offsets
   window.scrollTo(0, 0);
 
-  // Create an off-screen clone of the resume paper to avoid scroll offset errors
-  const clone = paper.cloneNode(true);
-  clone.id = "resumePaperClone";
-  clone.style.position = "absolute";
-  clone.style.left = "0";
-  clone.style.top = "0";
-  clone.style.width = "794px"; // Standard A4 width at 96 DPI
-  clone.style.maxWidth = "794px";
-  clone.style.minHeight = "auto"; // Flow height naturally
-  clone.style.boxShadow = "none";
-  clone.style.background = "#ffffff";
-  clone.style.color = "#1f2937";
-  clone.style.padding = "20mm"; // Standard corporate margin padding
-  clone.style.zIndex = "-99999";
-  clone.style.opacity = "1";
+  // Apply strict layout constraints directly to active element for capture
+  paper.style.width = "794px";
+  paper.style.maxWidth = "794px";
+  paper.style.minHeight = "auto";
+  paper.style.boxShadow = "none";
+  paper.style.padding = "20mm"; // 20mm standard margins
+
+  // Configure html2pdf options (direct capture, no clone)
+  const opt = {
+    margin: 0, 
+    filename: `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2.5, 
+      useCORS: true, 
+      letterRendering: true,
+      logging: false
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] } 
+  };
+
+  showToast("Compiling corporate-grade PDF print job...");
   
-  document.body.appendChild(clone);
-
-  // Wait briefly for DOM to fully layout the clone
+  // Wait briefly for style changes to render
   setTimeout(() => {
-    // Configure html2pdf options with height tracking
-    const opt = {
-      margin: 0, 
-      filename: `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2.5, 
-        useCORS: true, 
-        letterRendering: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 794,
-        windowHeight: clone.offsetHeight,
-        logging: false
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] } 
-    };
-
-    showToast("Compiling corporate-grade PDF print job...");
-    
-    html2pdf().from(clone).set(opt).save().then(() => {
-      document.body.removeChild(clone);
+    html2pdf().from(paper).set(opt).save().then(() => {
+      // Restore styles and scroll
+      paper.style.width = originalWidth;
+      paper.style.maxWidth = originalMaxWidth;
+      paper.style.minHeight = originalMinHeight;
+      paper.style.boxShadow = originalBoxShadow;
+      paper.style.padding = originalPadding;
       window.scrollTo(originalScrollX, originalScrollY);
       showToast("PDF Resume successfully downloaded!");
     }).catch(err => {
       console.error("PDF generation failure: ", err);
-      if (document.getElementById("resumePaperClone")) {
-        document.body.removeChild(clone);
-      }
+      // Restore styles and scroll even on error
+      paper.style.width = originalWidth;
+      paper.style.maxWidth = originalMaxWidth;
+      paper.style.minHeight = originalMinHeight;
+      paper.style.boxShadow = originalBoxShadow;
+      paper.style.padding = originalPadding;
       window.scrollTo(originalScrollX, originalScrollY);
       showToast("Error generating PDF. Please try again.");
     });
