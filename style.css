@@ -915,6 +915,7 @@ body {
 #res-section-projects {
   page-break-before: always !important;
   break-before: always !important;
+  padding-top: 18mm !important;
 }
 
 .res-section-title {
@@ -991,11 +992,11 @@ body {
   clear: both;
 }
 
-.res-entry-header span:first-child {
+.res-entry-left {
   float: left;
 }
 
-.res-entry-header span:last-child {
+.res-entry-right {
   float: right;
 }
 
@@ -1013,14 +1014,6 @@ body {
   content: "";
   display: table;
   clear: both;
-}
-
-.res-entry-subheader span:first-child {
-  float: left;
-}
-
-.res-entry-subheader span:last-child {
-  float: right;
 }
 
 .res-bullets {

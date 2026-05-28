@@ -662,12 +662,12 @@ function renderResumePaper(data) {
           ${data.experience.map(exp => `
             <div class="res-entry">
               <div class="res-entry-header">
-                <span>${exp.company}</span>
-                <span>${exp.location}</span>
+                <span class="res-entry-left">${exp.company}</span>
+                <span class="res-entry-right">${exp.location}</span>
               </div>
               <div class="res-entry-subheader">
-                <span>${exp.role}</span>
-                <span>${exp.startDate} &mdash; ${exp.endDate}</span>
+                <span class="res-entry-left">${exp.role}</span>
+                <span class="res-entry-right">${exp.startDate} &mdash; ${exp.endDate}</span>
               </div>
               <ul class="res-bullets">
                 ${exp.bullets.map(b => `<li class="res-bullet">${b}</li>`).join('')}
@@ -689,8 +689,8 @@ function renderResumePaper(data) {
           ${data.projects.map(proj => `
             <div class="res-entry">
               <div class="res-entry-header">
-                <span>${proj.name} ${proj.role ? ` | ${proj.role}` : ''}</span>
-                <span>${proj.link ? `<a href="https://${proj.link.replace('https://', '')}" target="_blank" style="font-size: 8.5pt; font-weight: normal; color: var(--res-accent); text-decoration: none;">Link</a>` : ''}</span>
+                <span class="res-entry-left">${proj.name}${proj.role ? ` | ${proj.role}` : ''}</span>
+                ${proj.link ? `<span class="res-entry-right"><a href="https://${proj.link.replace('https://', '')}" target="_blank" style="font-size: 8.5pt; font-weight: normal; color: var(--res-accent); text-decoration: none;">Link</a></span>` : ''}
               </div>
               <ul class="res-bullets" style="margin-top: 0.15rem;">
                 ${proj.bullets.map(b => `<li class="res-bullet">${b}</li>`).join('')}
@@ -712,12 +712,12 @@ function renderResumePaper(data) {
           ${data.education.map(edu => `
             <div class="res-entry">
               <div class="res-entry-header">
-                <span>${edu.institution}</span>
-                <span>${edu.location}</span>
+                <span class="res-entry-left">${edu.institution}</span>
+                <span class="res-entry-right">${edu.location}</span>
               </div>
               <div class="res-entry-subheader">
-                <span>${edu.degree}</span>
-                <span>Graduation: ${edu.year}</span>
+                <span class="res-entry-left">${edu.degree}</span>
+                <span class="res-entry-right">Graduation: ${edu.year}</span>
               </div>
             </div>
           `).join('')}
