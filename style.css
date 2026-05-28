@@ -859,9 +859,11 @@ body {
 
 /* ░░ ATS COMPATIBLE RESUME OUTPUT CSS ░░ */
 .res-header {
+  display: block;
   text-align: center;
   border-bottom: 2px solid var(--res-text);
   padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .res-name {
@@ -884,18 +886,16 @@ body {
 }
 
 .res-contact {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  display: block;
+  text-align: center;
   font-size: 8.5pt;
   color: var(--res-text-light);
 }
 
 .res-contact span {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  display: inline-block;
+  white-space: nowrap;
+  margin: 0 6px;
 }
 
 .res-contact a {
@@ -908,9 +908,8 @@ body {
 }
 
 .res-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: block;
+  margin-top: 1rem;
 }
 
 .res-section-title {
@@ -920,82 +919,117 @@ body {
   color: var(--res-text);
   border-bottom: 1px solid var(--res-border);
   padding-bottom: 0.2rem;
-  margin-top: 0.5rem;
+  margin-top: 0.8rem;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
 }
 
 .res-summary {
+  display: block;
   font-size: 9pt;
   color: var(--res-text-light);
-  line-height: 1.4;
+  line-height: 1.45;
+  margin-bottom: 0.5rem;
 }
 
 .res-skills-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 9pt;
+  display: block;
 }
 
 .res-skills-row {
-  display: flex;
-  gap: 0.5rem;
+  display: block;
+  margin-bottom: 0.35rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.res-skills-row::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .res-skills-label {
   font-weight: 700;
-  min-width: 120px;
+  float: left;
+  width: 130px;
   color: var(--res-text);
 }
 
 .res-skills-val {
+  float: left;
+  width: calc(100% - 135px);
   color: var(--res-text-light);
 }
 
 /* Experience & Projects layout */
 .res-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  display: block;
+  margin-bottom: 0.8rem;
 }
 
 .res-entry-header {
-  display: flex;
-  justify-content: space-between;
+  display: block;
   font-weight: 700;
   font-size: 9.5pt;
   color: var(--res-text);
+  margin-bottom: 0.1rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.res-entry-header::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.res-entry-header span:first-child {
+  float: left;
+}
+
+.res-entry-header span:last-child {
+  float: right;
 }
 
 .res-entry-subheader {
-  display: flex;
-  justify-content: space-between;
+  display: block;
   font-style: italic;
   font-size: 8.5pt;
   color: var(--res-text-light);
+  margin-bottom: 0.3rem;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.res-entry-subheader::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.res-entry-subheader span:first-child {
+  float: left;
+}
+
+.res-entry-subheader span:last-child {
+  float: right;
 }
 
 .res-bullets {
-  margin-left: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  display: block;
+  margin-left: 1.2rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.4rem;
 }
 
 .res-bullet {
+  display: list-item;
+  list-style-type: disc;
   font-size: 8.7pt;
   color: var(--res-text-light);
-  line-height: 1.35;
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.res-entry-header, .res-entry-subheader {
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.res-skills-row {
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
   page-break-inside: avoid;
   break-inside: avoid;
 }

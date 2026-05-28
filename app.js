@@ -795,56 +795,53 @@ function handleDownloadPdf() {
     return;
   }
 
-  // Save current inline styles to restore later
-  const originalWidth = paper.style.width;
-  const originalMaxWidth = paper.style.maxWidth;
-  const originalMinHeight = paper.style.minHeight;
-  const originalBoxShadow = paper.style.boxShadow;
-  const originalPadding = paper.style.padding;
+  // Create an off-screen clone of the resume paper to avoid scroll offset errors
+  const clone = paper.cloneNode(true);
+  clone.id = "resumePaperClone";
+  clone.style.position = "absolute";
+  clone.style.left = "0";
+  clone.style.top = "0";
+  clone.style.width = "794px"; // Standard A4 width at 96 DPI
+  clone.style.maxWidth = "794px";
+  clone.style.minHeight = "auto"; // Flow height naturally
+  clone.style.boxShadow = "none";
+  clone.style.background = "#ffffff";
+  clone.style.color = "#1f2937";
+  clone.style.padding = "20mm"; // Standard corporate margin padding
+  clone.style.zIndex = "-99999";
+  clone.style.opacity = "1";
+  
+  document.body.appendChild(clone);
 
-  // Apply strict print layout constraints (A4 aspect-ratio matching)
-  paper.style.width = "794px";
-  paper.style.maxWidth = "794px";
-  paper.style.minHeight = "auto";
-  paper.style.boxShadow = "none";
-  paper.style.padding = "20mm"; // 20mm standard margins
-
-  // Create clean configuration for recruiter grade print
+  // Configure html2pdf options
   const opt = {
-    margin: 0, // rely on CSS padding for margins (avoids scale squeezing)
+    margin: 0, // Rely entirely on clone's padding for margins (stops squeezing)
     filename: `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
       scale: 2.5, 
       useCORS: true, 
       letterRendering: true,
-      logging: false,
-      width: 794
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: document.documentElement.offsetWidth,
+      windowHeight: document.documentElement.offsetHeight,
+      logging: false
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: ['css', 'legacy'] } // Do NOT use avoid-all (it skips large items)
   };
 
   showToast("Compiling corporate-grade PDF print job...");
   
-  html2pdf().from(paper).set(opt).toPdf().get('pdf').then(function (pdf) {
-    // Optional: perform custom PDF adjustments here if needed
-  }).save().then(() => {
-    // Restore layout
-    paper.style.width = originalWidth;
-    paper.style.maxWidth = originalMaxWidth;
-    paper.style.minHeight = originalMinHeight;
-    paper.style.boxShadow = originalBoxShadow;
-    paper.style.padding = originalPadding;
+  html2pdf().from(clone).set(opt).save().then(() => {
+    document.body.removeChild(clone);
     showToast("PDF Resume successfully downloaded!");
   }).catch(err => {
     console.error("PDF generation failure: ", err);
-    // Restore layout even on error
-    paper.style.width = originalWidth;
-    paper.style.maxWidth = originalMaxWidth;
-    paper.style.minHeight = originalMinHeight;
-    paper.style.boxShadow = originalBoxShadow;
-    paper.style.padding = originalPadding;
+    if (document.getElementById("resumePaperClone")) {
+      document.body.removeChild(clone);
+    }
     showToast("Error generating PDF. Please try again.");
   });
 }
