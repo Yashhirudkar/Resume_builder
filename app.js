@@ -795,6 +795,13 @@ function handleDownloadPdf() {
     return;
   }
 
+  // Capture original scroll positions
+  const originalScrollY = window.scrollY;
+  const originalScrollX = window.scrollX;
+
+  // Scroll to absolute top-left to eliminate any viewport offset calculations
+  window.scrollTo(0, 0);
+
   // Create an off-screen clone of the resume paper to avoid scroll offset errors
   const clone = paper.cloneNode(true);
   clone.id = "resumePaperClone";
@@ -813,37 +820,218 @@ function handleDownloadPdf() {
   
   document.body.appendChild(clone);
 
-  // Configure html2pdf options
-  const opt = {
-    margin: 0, // Rely entirely on clone's padding for margins (stops squeezing)
-    filename: `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2.5, 
-      useCORS: true, 
-      letterRendering: true,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: document.documentElement.offsetWidth,
-      windowHeight: document.documentElement.offsetHeight,
-      logging: false
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'] } // Do NOT use avoid-all (it skips large items)
-  };
+  // Wait briefly for DOM to fully layout the clone
+  setTimeout(() => {
+    // Configure html2pdf options with height tracking
+    const opt = {
+      margin: 0, 
+      filename: `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2.5, 
+        useCORS: true, 
+        letterRendering: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794,
+        windowHeight: clone.offsetHeight,
+        logging: false
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] } 
+    };
 
-  showToast("Compiling corporate-grade PDF print job...");
-  
-  html2pdf().from(clone).set(opt).save().then(() => {
-    document.body.removeChild(clone);
-    showToast("PDF Resume successfully downloaded!");
-  }).catch(err => {
-    console.error("PDF generation failure: ", err);
-    if (document.getElementById("resumePaperClone")) {
+    showToast("Compiling corporate-grade PDF print job...");
+    
+    html2pdf().from(clone).set(opt).save().then(() => {
       document.body.removeChild(clone);
-    }
-    showToast("Error generating PDF. Please try again.");
+      window.scrollTo(originalScrollX, originalScrollY);
+      showToast("PDF Resume successfully downloaded!");
+    }).catch(err => {
+      console.error("PDF generation failure: ", err);
+      if (document.getElementById("resumePaperClone")) {
+        document.body.removeChild(clone);
+      }
+      window.scrollTo(originalScrollX, originalScrollY);
+      showToast("Error generating PDF. Please try again.");
+    });
+  }, 100);
+}
+
+// Word Export Execution (recruiter-grade rich text document)
+function handleDownloadWord() {
+  const paper = document.getElementById("resumePaper");
+  if (paper.querySelector(".resume-placeholder")) {
+    showToast("Please generate your resume first before exporting.");
+    return;
+  }
+
+  const htmlContent = paper.innerHTML;
+  
+  // Word HTML template matching corporate typography and printable specifications
+  const html = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <title>${state.fullName} - Resume</title>
+      <!--[if gte mso 9]>
+      <xml>
+        <w:WordDocument>
+          <w:View>Print</w:View>
+          <w:Zoom>100</w:Zoom>
+          <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+      </xml>
+      <![endif]-->
+      <style>
+        @page {
+          size: 8.5in 11.0in;
+          margin: 0.75in 0.75in 0.75in 0.75in;
+        }
+        body {
+          font-family: 'Calibri', 'Arial', sans-serif;
+          font-size: 10.5pt;
+          line-height: 1.3;
+          color: #111827;
+        }
+        .res-header {
+          text-align: center;
+          border-bottom: 2px solid #111827;
+          padding-bottom: 6pt;
+          margin-bottom: 12pt;
+        }
+        .res-name {
+          font-family: 'Calibri-Bold', 'Arial', sans-serif;
+          font-size: 20pt;
+          font-weight: bold;
+          text-transform: uppercase;
+          margin-bottom: 2pt;
+          color: #111827;
+        }
+        .res-title {
+          font-size: 11.5pt;
+          font-weight: bold;
+          color: #2563eb;
+          text-transform: uppercase;
+          margin-bottom: 4pt;
+        }
+        .res-contact {
+          text-align: center;
+          font-size: 9pt;
+          color: #4b5563;
+          margin-bottom: 6pt;
+        }
+        .res-contact span {
+          display: inline;
+          margin: 0 4pt;
+        }
+        .res-contact a {
+          color: #4b5563;
+          text-decoration: none;
+        }
+        .res-section {
+          margin-top: 14pt;
+          display: block;
+        }
+        .res-section-title {
+          font-size: 11.5pt;
+          font-weight: bold;
+          text-transform: uppercase;
+          color: #111827;
+          border-bottom: 1px solid #d1d5db;
+          padding-bottom: 2pt;
+          margin-top: 10pt;
+          margin-bottom: 6pt;
+        }
+        .res-summary {
+          font-size: 9.5pt;
+          color: #374151;
+          line-height: 1.35;
+          margin-bottom: 8pt;
+        }
+        .res-skills-grid {
+          margin-bottom: 6pt;
+        }
+        .res-skills-row {
+          margin-bottom: 4pt;
+        }
+        .res-skills-label {
+          font-weight: bold;
+          color: #111827;
+          width: 110pt;
+          float: left;
+        }
+        .res-skills-val {
+          color: #374151;
+          float: left;
+          width: 400pt;
+        }
+        .res-entry {
+          margin-bottom: 10pt;
+          display: block;
+          clear: both;
+        }
+        .res-entry-header {
+          font-weight: bold;
+          font-size: 10pt;
+          color: #111827;
+          margin-bottom: 1pt;
+          display: block;
+        }
+        .res-entry-header span:first-child {
+          float: left;
+        }
+        .res-entry-header span:last-child {
+          float: right;
+        }
+        .res-entry-subheader {
+          font-style: italic;
+          font-size: 9pt;
+          color: #4b5563;
+          margin-bottom: 4pt;
+          display: block;
+          clear: both;
+        }
+        .res-entry-subheader span:first-child {
+          float: left;
+        }
+        .res-entry-subheader span:last-child {
+          float: right;
+        }
+        .res-bullets {
+          margin-top: 4pt;
+          margin-bottom: 6pt;
+          padding-left: 15pt;
+          clear: both;
+        }
+        .res-bullet {
+          font-size: 9.5pt;
+          color: #374151;
+          margin-bottom: 2.5pt;
+          line-height: 1.3;
+        }
+      </style>
+    </head>
+    <body>
+      ${htmlContent}
+    </body>
+    </html>
+  `;
+
+  showToast("Compiling editable Microsoft Word document...");
+  
+  const blob = new Blob(['\ufeff' + html], {
+    type: 'application/msword'
   });
+  
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${state.fullName.toLowerCase().replace(/\s+/g, '_')}_resume.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Word Resume successfully downloaded!");
 }
 
 // Copy JSON trigger
@@ -857,6 +1045,12 @@ copyJsonBtn.addEventListener("click", () => {
 generateBtn.addEventListener("click", handleGenerate);
 downloadBtn.addEventListener("click", handleDownloadPdf);
 navDownloadBtn.addEventListener("click", handleDownloadPdf);
+
+// Bind Word downloader triggers
+const downloadWordBtn = document.getElementById("downloadWordBtn");
+const navDownloadWordBtn = document.getElementById("navDownloadWordBtn");
+if (downloadWordBtn) downloadWordBtn.addEventListener("click", handleDownloadWord);
+if (navDownloadWordBtn) navDownloadWordBtn.addEventListener("click", handleDownloadWord);
 
 // Initialize system
 window.addEventListener("DOMContentLoaded", () => {
