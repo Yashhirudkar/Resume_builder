@@ -912,6 +912,11 @@ body {
   margin-top: 1rem;
 }
 
+#res-section-projects {
+  page-break-before: always !important;
+  break-before: always !important;
+}
+
 .res-section-title {
   font-size: 11pt;
   font-weight: 700;

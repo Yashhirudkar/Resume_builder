@@ -683,7 +683,7 @@ function renderResumePaper(data) {
   let projectsHtml = "";
   if (data.projects && data.projects.length > 0) {
     projectsHtml = `
-      <section class="res-section">
+      <section class="res-section" id="res-section-projects">
         <h2 class="res-section-title">Technical Projects</h2>
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
           ${data.projects.map(proj => `
@@ -930,6 +930,10 @@ function handleDownloadWord() {
         .res-section {
           margin-top: 14pt;
           display: block;
+        }
+        #res-section-projects {
+          page-break-before: always;
+          break-before: always;
         }
         .res-section-title {
           font-size: 11.5pt;
