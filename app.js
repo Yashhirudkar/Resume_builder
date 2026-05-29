@@ -1997,42 +1997,56 @@ function initSkillsIntelligence() {
 const GEMINI_API_KEY = window.GEMINI_API_KEY || "";
 
 // Central Gemini API content generator
+// Auto-detects: local key → direct call | Vercel deploy → /api/gemini proxy
 async function callGeminiAPI(promptText) {
   try {
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-goog-api-key": GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: promptText
-              }
-            ]
-          }
-        ]
-      })
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API error: ${response.status} - ${errorText}`);
+    // If local key is available (config.js), call Gemini directly
+    if (GEMINI_API_KEY) {
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-goog-api-key": GEMINI_API_KEY
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }]
+          })
+        }
+      );
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+      const json = await response.json();
+      if (json.candidates?.[0]?.content?.parts?.[0]) {
+        return json.candidates[0].content.parts[0].text;
+      }
+      throw new Error("Invalid response schema from API");
     }
-    
+
+    // No local key → use Vercel serverless proxy (/api/gemini)
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: promptText })
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || `Proxy error: ${response.status}`);
+    }
     const json = await response.json();
-    if (json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0]) {
+    if (json.candidates?.[0]?.content?.parts?.[0]) {
       return json.candidates[0].content.parts[0].text;
     }
-    throw new Error("Invalid response schema from API");
+    throw new Error("Invalid response schema from proxy");
   } catch (error) {
     console.error("Gemini API Error:", error);
     throw error;
   }
 }
+
 
 // Safely clean markdown blocks and parse JSON
 function cleanAndParseJSON(text) {
