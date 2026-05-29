@@ -1,0 +1,13 @@
+# ── Secrets & Local Config ──────────────────────────────────
+config.js
+
+# ── OS & Editor ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/settings.json
+
+# ── Node (if ever added) ────────────────────────────────────
+node_modules/
+npm-debug.log*
